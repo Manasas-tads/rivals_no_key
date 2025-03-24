@@ -154,3 +154,32 @@ Players.PlayerAdded:Connect(function(player)
         end
     end)
 end)
+
+-- DRAGGING FUNCTIONALITY
+local dragging = false
+local dragStart = nil
+local startPos = nil
+
+-- Detect when the user clicks and starts dragging
+uiContainer.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = uiContainer.Position
+    end
+end)
+
+-- Update position as the user drags the UI
+uiContainer.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        uiContainer.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+-- Stop dragging when the user releases the mouse button
+uiContainer.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
