@@ -10,7 +10,7 @@ screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")  -- Ensure UI is in Pla
 screenGui.Name = "ESP_UI"
 
 local uiContainer = Instance.new("Frame")
-uiContainer.Size = UDim2.new(0, 250, 0, 120)  -- Adjust the size to create some space
+uiContainer.Size = UDim2.new(0, 250, 0, 170)  -- Initial size to make space for the ESP button
 uiContainer.Position = UDim2.new(0.5, -125, 0, 10)
 uiContainer.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 uiContainer.BackgroundTransparency = 0.5
@@ -91,6 +91,18 @@ local function createNameTag(player)
     end
 end
 
+-- Function to apply highlights and name tags to all players
+local function updatePlayers()
+    for _, player in pairs(Players:GetPlayers()) do
+        if ESPEnabled then
+            highlightPlayer(player)
+            createNameTag(player)
+        else
+            removeESP(player)
+        end
+    end
+end
+
 -- Function to remove highlights and name tags for a player
 local function removeESP(player)
     if player.Character then
@@ -102,18 +114,6 @@ local function removeESP(player)
         -- Remove name tag
         if player.Character:FindFirstChild("Head") and player.Character.Head:FindFirstChild("NameTag") then
             player.Character.Head.NameTag:Destroy()
-        end
-    end
-end
-
--- Function to apply highlights and name tags to all players
-local function updatePlayers()
-    for _, player in pairs(Players:GetPlayers()) do
-        if ESPEnabled then
-            highlightPlayer(player)
-            createNameTag(player)
-        else
-            removeESP(player)
         end
     end
 end
@@ -132,7 +132,7 @@ local function toggleESP()
     end
 
     -- Apply or remove ESP from all players based on the toggle state
-    updatePlayers()
+    updatePlayers()  -- Make sure to update the players when the ESP state changes
 end
 
 -- Connect the button to toggle ESP
@@ -153,6 +153,46 @@ Players.PlayerAdded:Connect(function(player)
             createNameTag(player)
         end
     end)
+end)
+
+-- Add "Kill Script" Section
+local killScriptLabel = Instance.new("TextLabel")
+killScriptLabel.Size = UDim2.new(0, 200, 0, 40)
+killScriptLabel.Position = UDim2.new(0.5, -killScriptLabel.Size.X.Offset / 2, 0, 120)  -- Position it below the ESP section
+killScriptLabel.Text = "Kill Script"
+killScriptLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+killScriptLabel.BackgroundTransparency = 1
+killScriptLabel.Font = Enum.Font.SourceSans
+killScriptLabel.TextSize = 24
+killScriptLabel.TextXAlignment = Enum.TextXAlignment.Center  -- Center the text
+killScriptLabel.TextYAlignment = Enum.TextYAlignment.Center  -- Center vertically
+killScriptLabel.Parent = uiContainer
+
+-- Create a button to remove the script
+local removeButton = Instance.new("TextButton")
+removeButton.Size = UDim2.new(0, 200, 0, 40)
+removeButton.Position = UDim2.new(0.5, -removeButton.Size.X.Offset / 2, 0, 160)  -- Position below the Kill Script label
+removeButton.Text = "Remove Script"
+removeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+removeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)  -- Red color for the kill button
+removeButton.Font = Enum.Font.SourceSans
+removeButton.TextSize = 24
+removeButton.Parent = uiContainer
+
+-- Create UICorner for rounding the corners of the remove button
+local removeButtonCorner = Instance.new("UICorner")
+removeButtonCorner.CornerRadius = UDim.new(0, 20)  -- Round the corners of the remove button
+removeButtonCorner.Parent = removeButton
+
+-- Function to kill the script (remove the UI and script)
+local function killScript()
+    -- Destroy the UI and this script
+    screenGui:Destroy()
+end
+
+-- Connect the remove button to kill the script
+removeButton.MouseButton1Click:Connect(function()
+    killScript()
 end)
 
 -- DRAGGING FUNCTIONALITY
@@ -183,3 +223,6 @@ uiContainer.InputEnded:Connect(function(input)
         dragging = false
     end
 end)
+
+-- Adjust the size of the UI container to fit everything (when you add the "Kill Script" section)
+uiContainer.Size = UDim2.new(0, 250, 0, 220)  -- Update the size of the UI container to extend with the new content
