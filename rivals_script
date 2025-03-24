@@ -1,6 +1,54 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
+local LocalPlayer = Players.LocalPlayer
+local ESPEnabled = false  -- Track if ESP is enabled
+
+-- Create the UI container
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")  -- Ensure UI is in PlayerGui
+screenGui.Name = "ESP_UI"
+
+local uiContainer = Instance.new("Frame")
+uiContainer.Size = UDim2.new(0, 250, 0, 120)  -- Adjust the size to create some space
+uiContainer.Position = UDim2.new(0.5, -125, 0, 10)
+uiContainer.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+uiContainer.BackgroundTransparency = 0.5
+uiContainer.Parent = screenGui
+
+-- Apply rounded corners using UICorner
+local uiCorner = Instance.new("UICorner")
+uiCorner.CornerRadius = UDim.new(0, 15)  -- Round the corners of the container
+uiCorner.Parent = uiContainer
+
+-- Create the text label for ESP
+local espTextLabel = Instance.new("TextLabel")
+espTextLabel.Size = UDim2.new(0, 200, 0, 40)
+espTextLabel.Position = UDim2.new(0, 0, 0, 0)
+espTextLabel.Text = "ESP"
+espTextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+espTextLabel.BackgroundTransparency = 1
+espTextLabel.Font = Enum.Font.SourceSans
+espTextLabel.TextSize = 24
+espTextLabel.TextXAlignment = Enum.TextXAlignment.Left
+espTextLabel.Parent = uiContainer
+
+-- Create a button to toggle ESP
+local toggleButton = Instance.new("TextButton")
+toggleButton.Size = UDim2.new(0, 200, 0, 40)
+toggleButton.Position = UDim2.new(0, 0, 0, 50)
+toggleButton.Text = "Enable ESP"
+toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+toggleButton.BackgroundColor3 = Color3.fromRGB(0, 128, 0)  -- Green color for OFF
+toggleButton.Font = Enum.Font.SourceSans
+toggleButton.TextSize = 24
+toggleButton.Parent = uiContainer
+
+-- Create UICorner for rounding the corners of the button
+local buttonCorner = Instance.new("UICorner")
+buttonCorner.CornerRadius = UDim.new(0, 20)  -- Round the corners of the button
+buttonCorner.Parent = toggleButton
+
 -- Function to highlight a player
 local function highlightPlayer(player)
     if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
@@ -42,13 +90,54 @@ local function createNameTag(player)
     end
 end
 
+-- Function to remove highlights and name tags for a player
+local function removeESP(player)
+    if player.Character then
+        -- Remove highlight
+        if player.Character:FindFirstChild("Highlight") then
+            player.Character.Highlight:Destroy()
+        end
+
+        -- Remove name tag
+        if player.Character:FindFirstChild("Head") and player.Character.Head:FindFirstChild("NameTag") then
+            player.Character.Head.NameTag:Destroy()
+        end
+    end
+end
+
 -- Function to apply highlights and name tags to all players
 local function updatePlayers()
     for _, player in pairs(Players:GetPlayers()) do
-        highlightPlayer(player)
-        createNameTag(player)
+        if ESPEnabled then
+            highlightPlayer(player)
+            createNameTag(player)
+        else
+            removeESP(player)
+        end
     end
 end
+
+-- Function to toggle ESP on and off
+local function toggleESP()
+    ESPEnabled = not ESPEnabled
+
+    -- Update the button text and color
+    if ESPEnabled then
+        toggleButton.Text = "Disable ESP"
+        toggleButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)  -- Red color for ON
+    else
+        toggleButton.Text = "Enable ESP"
+        toggleButton.BackgroundColor3 = Color3.fromRGB(0, 128, 0)  -- Green color for OFF
+    end
+
+    -- Apply or remove ESP from all players based on the toggle state
+    updatePlayers()
+end
+
+-- Connect the button to toggle ESP
+toggleButton.MouseButton1Click:Connect(function()
+    toggleESP()
+end)
 
 -- Apply to existing players
 updatePlayers()
@@ -56,8 +145,10 @@ updatePlayers()
 -- Listen for new players joining
 Players.PlayerAdded:Connect(function(player)
     player.CharacterAdded:Connect(function()
-        highlightPlayer(player)
-        createNameTag(player)
+        if ESPEnabled then
+            highlightPlayer(player)
+            createNameTag(player)
+        end
     end)
 end)
 
