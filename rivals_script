@@ -1,0 +1,65 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+-- Function to highlight a player
+local function highlightPlayer(player)
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        -- Check if highlight already exists
+        if not player.Character:FindFirstChild("Highlight") then
+            local highlight = Instance.new("Highlight")
+            highlight.Parent = player.Character
+            highlight.FillColor = Color3.fromRGB(255, 255, 0) -- Yellow color
+            highlight.OutlineColor = Color3.fromRGB(0, 0, 0) -- Black outline
+            highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop -- Visible through walls
+        end
+    end
+end
+
+-- Function to create a floating name tag
+local function createNameTag(player)
+    if player.Character and player.Character:FindFirstChild("Head") then
+        local head = player.Character.Head
+
+        -- Check if nametag already exists
+        if head:FindFirstChild("NameTag") then return end
+
+        local billboard = Instance.new("BillboardGui")
+        billboard.Name = "NameTag"
+        billboard.Adornee = head
+        billboard.Size = UDim2.new(4, 0, 1, 0) -- Adjust size
+        billboard.StudsOffset = Vector3.new(0, 2.5, 0) -- Position above head
+        billboard.AlwaysOnTop = true
+        billboard.Parent = head
+
+        local textLabel = Instance.new("TextLabel")
+        textLabel.Size = UDim2.new(1, 0, 1, 0)
+        textLabel.BackgroundTransparency = 1
+        textLabel.Text = player.Name
+        textLabel.Font = Enum.Font.SourceSansBold
+        textLabel.TextSize = 20
+        textLabel.TextColor3 = Color3.fromRGB(255, 255, 255) -- White text
+        textLabel.Parent = billboard
+    end
+end
+
+-- Function to apply highlights and name tags to all players
+local function updatePlayers()
+    for _, player in pairs(Players:GetPlayers()) do
+        highlightPlayer(player)
+        createNameTag(player)
+    end
+end
+
+-- Apply to existing players
+updatePlayers()
+
+-- Listen for new players joining
+Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function()
+        highlightPlayer(player)
+        createNameTag(player)
+    end)
+end)
+
+-- Continuously update highlights & name tags in case players reset their characters
+RunService.Heartbeat:Connect(updatePlayers)
