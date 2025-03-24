@@ -12,7 +12,7 @@ screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")  -- Ensure UI is in Pla
 screenGui.Name = "ESP_UI"
 
 local uiContainer = Instance.new("Frame")
-uiContainer.Size = UDim2.new(0, 250, 0, 270)  -- Initial size to make space for the buttons
+uiContainer.Size = UDim2.new(0, 250, 0, 300)  -- Initial size to make space for the buttons
 uiContainer.Position = UDim2.new(0.5, -125, 0, 10)
 uiContainer.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 uiContainer.BackgroundTransparency = 0.5
