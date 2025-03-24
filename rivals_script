@@ -24,19 +24,20 @@ uiCorner.Parent = uiContainer
 -- Create the text label for ESP
 local espTextLabel = Instance.new("TextLabel")
 espTextLabel.Size = UDim2.new(0, 200, 0, 40)
-espTextLabel.Position = UDim2.new(0, 0, 0, 0)
+espTextLabel.Position = UDim2.new(0.5, -espTextLabel.Size.X.Offset / 2, 0, 0)  -- Center the text
 espTextLabel.Text = "ESP"
 espTextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 espTextLabel.BackgroundTransparency = 1
 espTextLabel.Font = Enum.Font.SourceSans
 espTextLabel.TextSize = 24
-espTextLabel.TextXAlignment = Enum.TextXAlignment.Left
+espTextLabel.TextXAlignment = Enum.TextXAlignment.Center  -- Center the text
+espTextLabel.TextYAlignment = Enum.TextYAlignment.Center  -- Center vertically
 espTextLabel.Parent = uiContainer
 
 -- Create a button to toggle ESP
 local toggleButton = Instance.new("TextButton")
 toggleButton.Size = UDim2.new(0, 200, 0, 40)
-toggleButton.Position = UDim2.new(0, 0, 0, 50)
+toggleButton.Position = UDim2.new(0.5, -toggleButton.Size.X.Offset / 2, 0, 50)  -- Center the button
 toggleButton.Text = "Enable ESP"
 toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 toggleButton.BackgroundColor3 = Color3.fromRGB(0, 128, 0)  -- Green color for OFF
@@ -139,8 +140,10 @@ toggleButton.MouseButton1Click:Connect(function()
     toggleESP()
 end)
 
--- Apply to existing players
-updatePlayers()
+-- Only apply to existing players when ESP is first enabled
+if ESPEnabled then
+    updatePlayers()
+end
 
 -- Listen for new players joining
 Players.PlayerAdded:Connect(function(player)
@@ -151,6 +154,3 @@ Players.PlayerAdded:Connect(function(player)
         end
     end)
 end)
-
--- Continuously update highlights & name tags in case players reset their characters
-RunService.Heartbeat:Connect(updatePlayers)
